@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from app.db.session import engine
 from app.db.base import Base
-from app.models import user
 from app.api.users import router as users_router
 
 app = FastAPI(title="Secure Collaborative Platform")
@@ -9,7 +8,7 @@ app = FastAPI(title="Secure Collaborative Platform")
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Include routers
+# Include user routes
 app.include_router(users_router)
 
 # Health check
