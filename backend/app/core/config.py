@@ -1,7 +1,5 @@
-import os
-from typing import Optional
+from datetime import timedelta
 
-# JWT Configuration
-SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
-ALGORITHM: str = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+SECRET_KEY = "CHANGE_THIS_IN_PRODUCTION"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
