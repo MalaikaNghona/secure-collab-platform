@@ -5,20 +5,14 @@ pwd_context = CryptContext(
     deprecated="auto"
 )
 
-MAX_BCRYPT_PASSWORD_BYTES = 75
+MAX_PASSWORD_BYTES = 72
+
+def _truncate(password: str) -> bytes:
+    pw_bytes = password.encode("utf-8")
+    return pw_bytes[:MAX_PASSWORD_BYTES]
 
 def hash_password(password: str) -> str:
-    password_bytes = password.encode("utf-8")
-
-    if len(password_bytes) > MAX_BCRYPT_PASSWORD_BYTES:
-        password_bytes = password_bytes[:MAX_BCRYPT_PASSWORD_BYTES]
-
-    return pwd_context.hash(password_bytes)
+    return pwd_context.hash(_truncate(password))
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    password_bytes = plain_password.encode("utf-8")
-
-    if len(password_bytes) > MAX_BCRYPT_PASSWORD_BYTES:
-        password_bytes = password_bytes[:MAX_BCRYPT_PASSWORD_BYTES]
-
-    return pwd_context.verify(password_bytes, hashed_password)
+    return pwd_context.verify(_truncate(plain_password), hashed_password)
