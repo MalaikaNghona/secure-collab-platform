@@ -1,20 +1,18 @@
-from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate
 from app.core.security import hash_password
-from app.core.jwt import create_access_token
-from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/users",
     tags=["users"]
 )
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -30,16 +28,16 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Create access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(new_user.id), "email": new_user.email},
-        expires_delta=access_token_expires
-    )
+    # ✅ Registration returns identity confirmation ONLY
+    return {
+        "id": new_user.id,
+        "email": new_user.email,
+    }
 
-    return UserResponse(
-        id=new_user.id,
-        email=new_user.email,
-        access_token=access_token,
-        token_type="bearer"
-    )
+@router.get("/me")
+def read_current_user(current_user=Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+    }
