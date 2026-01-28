@@ -1,9 +1,10 @@
-from pydantic import BaseModel, EmailStr
+"""
+Pydantic schemas for authentication.
+"""
+from pydantic import BaseModel
 
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
 
-class TokenResponse(BaseModel):
+class Token(BaseModel):
+    """Schema for login response."""
     access_token: str
-    token_type: str = "bearer"
+    token_type: str
